@@ -1,8 +1,9 @@
 // @flow strict-local
-
 import * as React from 'react';
 import {useWindowDimensions, StyleSheet, View, Text} from 'react-native';
 import {Screen} from '@react-navigation/native';
+import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
+import {SurfRouter} from './SurfRouter';
 // import NavigationStateContext from '@react-navigation/core/NavigationStateContext';
 // import NavigationRouteContext from '@react-navigation/core/NavigationRouteContext';
 // import useRegisterNavigator from '@react-navigation/core/useRegisterNavigator';
@@ -88,9 +89,10 @@ const tabStateToStackOne = state => ({
 export const SurfNavigator = ({children, initialRouteName, screenOptions}) => {
   const {width: windowWidth} = useWindowDimensions();
   const isSplitted = windowWidth > 600;
+
   let mainScreen;
 
-  const {state, navigation, descriptors} = useNavigationBuilder(TabRouter, {
+  const {state, navigation, descriptors} = useNavigationBuilder(SurfRouter, {
     children: isSplitted
       ? React.Children.toArray(children).filter(child => {
           if (child.props.name !== 'main') {
@@ -104,6 +106,14 @@ export const SurfNavigator = ({children, initialRouteName, screenOptions}) => {
     screenOptions,
   });
 
+  const loadedRef = React.useRef([]);
+
+  React.useEffect(() => {
+    if (!loadedRef.current.includes(state.index)) {
+      loadedRef.current = [...loadedRef.current, state.index];
+    }
+  }, [state]);
+
   if (isSplitted) {
     const MainScreen = mainScreen;
     return (
@@ -113,7 +123,23 @@ export const SurfNavigator = ({children, initialRouteName, screenOptions}) => {
             <MainScreen navigation={navigation} />
           </View>
           <View style={styles.detail}>
-            {descriptors[state.routes[state.index].key].render()}
+            {state.routes.map((route, index) => {
+              const descriptor = descriptors[route.key];
+              const isFocused = state.index === index;
+
+              if (!isSplitted && !loadedRef.current.includes(index)) {
+                return null;
+              }
+
+              return (
+                <ResourceSavingScene
+                  key={route.key}
+                  style={StyleSheet.absoluteFill}
+                  isVisible={isFocused}>
+                  {descriptor.render()}
+                </ResourceSavingScene>
+              );
+            })}
           </View>
         </View>
       </NavigationHelpersContext.Provider>
@@ -141,13 +167,11 @@ const styles = StyleSheet.create({
     minWidth: 300,
     marginRight: 10,
     borderRadius: 5,
-    padding: 10,
   },
   detail: {
     backgroundColor: 'white',
     flex: 1,
     borderRadius: 5,
-    padding: 10,
   },
   title: {
     fontSize: 24,
