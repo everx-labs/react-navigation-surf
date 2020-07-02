@@ -1,78 +1,6 @@
 // @flow strict-local
 import * as React from 'react';
 import {useWindowDimensions, StyleSheet, View, Text} from 'react-native';
-import {Screen} from '@react-navigation/native';
-import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
-import {SurfRouter} from './SurfRouter';
-// import NavigationStateContext from '@react-navigation/core/NavigationStateContext';
-// import NavigationRouteContext from '@react-navigation/core/NavigationRouteContext';
-// import useRegisterNavigator from '@react-navigation/core/useRegisterNavigator';
-
-const getStackRouteConfigFromChildren = (children: React.ReactNode) => {
-  return React.Children.toArray(children).reduce((acc, child) => {
-    if (React.isValidElement(child)) {
-      if (child.type === Screen) {
-        acc.push(child.props);
-        return acc;
-      }
-      if (child.type === React.Fragment) {
-        // When we encounter a fragment, we need to dive into its children to extract the configs
-        // This is handy to conditionally define a group of screens
-        acc.push(...getRouteConfigsFromChildren(child.props.children));
-        return acc;
-      }
-    }
-
-    throw new Error(
-      `A navigator can only contain 'Screen' components as its direct children (found '${
-        child.type && child.type.name ? child.type.name : String(child)
-      }')`,
-    );
-  }, []);
-};
-
-class Section {}
-
-const getRouteConfigsFromChildren = (children: React.ReactNode) => {
-  return React.Children.toArray(children).reduce((acc, child) => {
-    if (React.isValidElement(child)) {
-      if (child.type === Section) {
-        acc.push({
-          name: child.props.name,
-          config: getRouteConfigsFromChildren(child.props.children),
-        });
-        return acc;
-      }
-      if (child.type === React.Fragment) {
-        // When we encounter a fragment, we need to dive into its children to extract the configs
-        // This is handy to conditionally define a group of screens
-        acc.push(...getRouteConfigsFromChildren(child.props.children));
-        return acc;
-      }
-    }
-
-    throw new Error(
-      `A navigator can only contain 'Section' components as its direct children (found '${
-        child.type && child.type.name ? child.type.name : String(child)
-      }')`,
-    );
-  }, []);
-};
-
-// export default function useNavigationBuilder(createRouter, options) {
-//   const navigatorKey = useRegisterNavigator();
-
-//   const route = React.useContext(NavigationRouteContext);
-
-//   const previousNestedParamsRef = React.useRef(route?.params);
-
-//   React.useEffect(() => {
-//     previousNestedParamsRef.current = route?.params;
-//   }, [route]);
-
-//   const {children, ...rest} = options;
-// }
-
 import {
   NavigationHelpersContext,
   useNavigationBuilder,
@@ -80,9 +8,11 @@ import {
   TabRouter,
 } from '@react-navigation/native';
 import {StackView} from '@react-navigation/stack';
+import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
 
 const tabStateToStackOne = state => ({
-  type: 'tab',
+  ...state,
+  type: 'stack',
   index: 0,
 });
 
@@ -92,7 +22,7 @@ export const SurfNavigator = ({children, initialRouteName, screenOptions}) => {
 
   let mainScreen;
 
-  const {state, navigation, descriptors} = useNavigationBuilder(SurfRouter, {
+  const {state, navigation, descriptors} = useNavigationBuilder(TabRouter, {
     children: isSplitted
       ? React.Children.toArray(children).filter(child => {
           if (child.props.name !== 'main') {
@@ -147,7 +77,7 @@ export const SurfNavigator = ({children, initialRouteName, screenOptions}) => {
   }
   return (
     <StackView
-      state={state}
+      state={tabStateToStackOne(state)}
       navigation={navigation}
       descriptors={descriptors}
     />
