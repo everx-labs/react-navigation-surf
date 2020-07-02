@@ -25,27 +25,25 @@ const Main = ({navigation}) => (
   </View>
 );
 
+const Detail1Foo = ({navigation}) => (
+  <View>
+    <Text style={styles.title}>Detail 1 - foo</Text>
+    <Button onPress={() => navigation.push('bar')} title="Go to bar" />
+  </View>
+);
+
+const Detail1Bar = ({navigation}) => (
+  <View>
+    <Text style={styles.title}>Detail 1 - bar</Text>
+    <Button onPress={() => navigation.push('foo')} title="Go to foo" />
+  </View>
+);
+
 const Detail1Stack = createStackNavigator();
 const Detail1 = () => (
   <Detail1Stack.Navigator initialRouteName="foo">
-    <Detail1Stack.Screen
-      name="foo"
-      component={({navigation}) => (
-        <View>
-          <Text style={styles.title}>Detail 1 - foo</Text>
-          <Button onPress={() => navigation.push('bar')} title="Go to bar" />
-        </View>
-      )}
-    />
-    <Detail1Stack.Screen
-      name="bar"
-      component={({navigation}) => (
-        <View>
-          <Text style={styles.title}>Detail 1 - bar</Text>
-          <Button onPress={() => navigation.push('foo')} title="Go to foo" />
-        </View>
-      )}
-    />
+    <Detail1Stack.Screen name="foo" component={Detail1Foo} />
+    <Detail1Stack.Screen name="bar" component={Detail1Bar} />
   </Detail1Stack.Navigator>
 );
 

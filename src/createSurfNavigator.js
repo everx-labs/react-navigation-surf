@@ -1,6 +1,12 @@
 // @flow strict-local
 import * as React from 'react';
-import {useWindowDimensions, StyleSheet, View, Text} from 'react-native';
+import {
+  useWindowDimensions,
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+} from 'react-native';
 import {
   NavigationHelpersContext,
   useNavigationBuilder,
@@ -10,19 +16,28 @@ import {
 import {StackView} from '@react-navigation/stack';
 import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
 
-const tabStateToStackOne = state => ({
-  ...state,
-  type: 'stack',
-  index: 0,
-});
+import {SurfRouter, setIsSplitted} from './SurfRouter';
+
+const tabStateToStackOne = ({history, ...rest}) => {
+  const {index} = rest;
+  const routes = [rest.routes[0]];
+  return {
+    ...rest,
+    type: 'stack',
+    routes: index > 0 ? routes.concat(rest.routes[index]) : routes,
+  };
+};
+
+const getIsSplitted = ({width}) => width > 600;
 
 export const SurfNavigator = ({children, initialRouteName, screenOptions}) => {
-  const {width: windowWidth} = useWindowDimensions();
-  const isSplitted = windowWidth > 600;
+  const dimensions = useWindowDimensions();
+  const isSplitted = getIsSplitted(dimensions);
+  setIsSplitted(isSplitted);
 
   let mainScreen;
 
-  const {state, navigation, descriptors} = useNavigationBuilder(TabRouter, {
+  const {state, navigation, descriptors} = useNavigationBuilder(SurfRouter, {
     children: isSplitted
       ? React.Children.toArray(children).filter(child => {
           if (child.props.name !== 'main') {
@@ -77,7 +92,7 @@ export const SurfNavigator = ({children, initialRouteName, screenOptions}) => {
   }
   return (
     <StackView
-      state={tabStateToStackOne(state)}
+      state={state}
       navigation={navigation}
       descriptors={descriptors}
     />
