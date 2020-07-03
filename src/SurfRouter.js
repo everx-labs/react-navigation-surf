@@ -7,7 +7,7 @@ export const setIsSplitted = s => {
   isSplitted = s;
 };
 
-export function SurfRouter(options) {
+export function SurfSplitRouter(options) {
   const tabRouter = TabRouter(options);
   const stackRouter = StackRouter(options);
   const router = {

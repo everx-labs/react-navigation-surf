@@ -13,9 +13,9 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useReduxDevToolsExtension} from '@react-navigation/devtools';
 
-import {createSurfNavigator} from './src/createSurfNavigator';
+import {createSurfSplitNavigator} from './src/createSurfNavigator';
 
-const Surf = createSurfNavigator();
+const SurfSplit = createSurfSplitNavigator();
 
 const Main = ({navigation}) => (
   <View>
@@ -55,11 +55,11 @@ const App: () => React$Node = () => {
 
   return (
     <NavigationContainer ref={navRef} linking={['/']}>
-      <Surf.Navigator initialRouteName="first">
-        <Surf.Screen name="main" component={Main} />
-        <Surf.Screen name="first" component={Detail1} />
-        <Surf.Screen name="second" component={Detail2} />
-      </Surf.Navigator>
+      <SurfSplit.Navigator initialRouteName="first">
+        <SurfSplit.Screen name="main" component={Main} />
+        <SurfSplit.Screen name="first" component={Detail1} />
+        <SurfSplit.Screen name="second" component={Detail2} />
+      </SurfSplit.Navigator>
     </NavigationContainer>
   );
 };
