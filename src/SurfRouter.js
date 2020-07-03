@@ -24,9 +24,18 @@ export function SurfSplitRouter(options) {
     },
 
     getRehydratedState(...args) {
-      return isSplitted
-        ? tabRouter.getRehydratedState(...args)
-        : stackRouter.getRehydratedState(...args);
+      if (isSplitted) {
+        return tabRouter.getRehydratedState(...args);
+      }
+      const stackState = stackRouter.getRehydratedState(...args);
+      const mainRoute = stackState.routes.find(({name}) => name === 'main');
+      if (!mainRoute) {
+        stackState.index = stackState.index + 1;
+        stackState.routes = [{name: 'main', key: `main-${nanoid()}`}].concat(
+          stackState.routes,
+        );
+      }
+      return stackState;
     },
 
     getStateForRouteNamesChange(...args) {

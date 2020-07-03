@@ -39,27 +39,25 @@ export const SurfSplitNavigator = ({
   const isSplitted = getIsSplitted(dimensions);
   setIsSplitted(isSplitted);
 
-  let mainScreen;
-
+  const {splitStyles, headerShown, ...restScreenOptions} = screenOptions || {
+    splitStyles: {
+      body: styles.body,
+      main: styles.main,
+      detail: styles.detail,
+    },
+  };
   const {state, navigation, descriptors} = useNavigationBuilder(
     SurfSplitRouter,
     {
-      children: isSplitted
-        ? React.Children.toArray(children).filter(child => {
-            if (child.props.name !== 'main') {
-              return true;
-            }
-            mainScreen = child.props.component;
-            return false;
-          })
-        : children,
+      children,
       initialRouteName: isSplitted ? initialRouteName : 'main',
       screenOptions: {
-        ...screenOptions,
+        ...restScreenOptions,
         headerShown: false,
       },
     },
   );
+  console.log(JSON.stringify(state, null, '  '));
 
   const loadedRef = React.useRef([]);
 
@@ -70,14 +68,14 @@ export const SurfSplitNavigator = ({
   }, [state]);
 
   if (isSplitted) {
-    const MainScreen = mainScreen;
+    const mainRoute = state.routes.find(({name}) => name === 'main');
     return (
       <NavigationHelpersContext.Provider>
-        <View style={styles.body}>
-          <View style={styles.main}>
-            <MainScreen navigation={navigation} />
+        <View style={splitStyles.body}>
+          <View style={splitStyles.main}>
+            {descriptors[mainRoute.key].render()}
           </View>
-          <View style={styles.detail}>
+          <View style={splitStyles.detail}>
             {state.routes.map((route, index) => {
               const descriptor = descriptors[route.key];
               const isFocused = state.index === index;
@@ -129,9 +127,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flex: 1,
     borderRadius: 5,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
   },
 });
