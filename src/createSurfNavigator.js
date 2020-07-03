@@ -16,7 +16,7 @@ import {
 import {StackView} from '@react-navigation/stack';
 import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
 
-import {SurfRouter, setIsSplitted} from './SurfRouter';
+import {SurfSplitRouter, setIsSplitted} from './SurfRouter';
 
 const tabStateToStackOne = ({history, ...rest}) => {
   const {index} = rest;
@@ -30,26 +30,36 @@ const tabStateToStackOne = ({history, ...rest}) => {
 
 const getIsSplitted = ({width}) => width > 600;
 
-export const SurfNavigator = ({children, initialRouteName, screenOptions}) => {
+export const SurfSplitNavigator = ({
+  children,
+  initialRouteName,
+  screenOptions,
+}) => {
   const dimensions = useWindowDimensions();
   const isSplitted = getIsSplitted(dimensions);
   setIsSplitted(isSplitted);
 
   let mainScreen;
 
-  const {state, navigation, descriptors} = useNavigationBuilder(SurfRouter, {
-    children: isSplitted
-      ? React.Children.toArray(children).filter(child => {
-          if (child.props.name !== 'main') {
-            return true;
-          }
-          mainScreen = child.props.component;
-          return false;
-        })
-      : children,
-    initialRouteName: isSplitted ? initialRouteName : 'main',
-    screenOptions,
-  });
+  const {state, navigation, descriptors} = useNavigationBuilder(
+    SurfSplitRouter,
+    {
+      children: isSplitted
+        ? React.Children.toArray(children).filter(child => {
+            if (child.props.name !== 'main') {
+              return true;
+            }
+            mainScreen = child.props.component;
+            return false;
+          })
+        : children,
+      initialRouteName: isSplitted ? initialRouteName : 'main',
+      screenOptions: {
+        ...screenOptions,
+        headerShown: false,
+      },
+    },
+  );
 
   const loadedRef = React.useRef([]);
 
@@ -99,7 +109,9 @@ export const SurfNavigator = ({children, initialRouteName, screenOptions}) => {
   );
 };
 
-export const createSurfNavigator = createNavigatorFactory(SurfNavigator);
+export const createSurfSplitNavigator = createNavigatorFactory(
+  SurfSplitNavigator,
+);
 
 const styles = StyleSheet.create({
   body: {
