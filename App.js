@@ -67,7 +67,8 @@ const App: () => React$Node = () => {
             main: styles.main,
             detail: styles.detail,
           },
-        }}>
+        }}
+        mainWidth={600}>
         <SurfSplit.Screen name="main" component={Main} />
         <SurfSplit.Screen name="first" component={Detail1} />
         <SurfSplit.Screen name="second" component={Detail2} />

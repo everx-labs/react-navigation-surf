@@ -16,28 +16,18 @@ import {
 import {StackView} from '@react-navigation/stack';
 import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
 
-import {SurfSplitRouter, setIsSplitted} from './SurfRouter';
+import {SurfSplitRouter, SurfSplitActions} from './SurfRouter';
 
-const tabStateToStackOne = ({history, ...rest}) => {
-  const {index} = rest;
-  const routes = [rest.routes[0]];
-  return {
-    ...rest,
-    type: 'stack',
-    routes: index > 0 ? routes.concat(rest.routes[index]) : routes,
-  };
-};
-
-const getIsSplitted = ({width}) => width > 600;
+const getIsSplitted = ({width}, mainWidth) => width > mainWidth;
 
 export const SurfSplitNavigator = ({
   children,
   initialRouteName,
   screenOptions,
+  mainWidth,
 }) => {
   const dimensions = useWindowDimensions();
-  const isSplitted = getIsSplitted(dimensions);
-  setIsSplitted(isSplitted);
+  const isSplitted = getIsSplitted(dimensions, mainWidth);
 
   const {splitStyles, headerShown, ...restScreenOptions} = screenOptions || {
     splitStyles: {
@@ -50,14 +40,22 @@ export const SurfSplitNavigator = ({
     SurfSplitRouter,
     {
       children,
-      initialRouteName: isSplitted ? initialRouteName : 'main',
+      initialRouteName: initialRouteName,
       screenOptions: {
         ...restScreenOptions,
         headerShown: false,
       },
+      isSplitted,
     },
   );
-  console.log(JSON.stringify(state, null, '  '));
+  React.useEffect(() => {
+    navigation.dispatch(
+      SurfSplitActions.setSplitted(
+        isSplitted,
+        isSplitted ? initialRouteName : 'main',
+      ),
+    );
+  }, [isSplitted]);
 
   const loadedRef = React.useRef([]);
 
@@ -100,7 +98,7 @@ export const SurfSplitNavigator = ({
   }
   return (
     <StackView
-      state={state}
+      state={{...state, type: 'stack'}}
       navigation={navigation}
       descriptors={descriptors}
     />
