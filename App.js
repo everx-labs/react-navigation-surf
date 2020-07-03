@@ -8,7 +8,7 @@
 
 import 'react-native-gesture-handler';
 import React from 'react';
-import {StyleSheet, View, Text, Button} from 'react-native';
+import {StyleSheet, View, Text, Button, SafeAreaView} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useReduxDevToolsExtension} from '@react-navigation/devtools';
@@ -18,11 +18,11 @@ import {createSurfSplitNavigator} from './src/createSurfNavigator';
 const SurfSplit = createSurfSplitNavigator();
 
 const Main = ({navigation}) => (
-  <View>
+  <SafeAreaView>
     <Text style={styles.title}>Main</Text>
     <Button onPress={() => navigation.navigate('first')} title="Go to 1" />
     <Button onPress={() => navigation.navigate('second')} title="Go to 2" />
-  </View>
+  </SafeAreaView>
 );
 
 const Detail1Foo = ({navigation}) => (
@@ -47,7 +47,11 @@ const Detail1 = () => (
   </Detail1Stack.Navigator>
 );
 
-const Detail2 = () => <Text style={styles.title}>Detail 2</Text>;
+const Detail2 = () => (
+  <SafeAreaView>
+    <Text style={styles.title}>Detail 2</Text>
+  </SafeAreaView>
+);
 
 const App: () => React$Node = () => {
   const navRef = React.useRef();
