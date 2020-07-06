@@ -8,12 +8,61 @@ export const SurfSplitActions = {
   },
 };
 
-export function SurfSplitRouter(options) {
-  const tabRouter = TabRouter(options);
-  const stackRouter = StackRouter(options);
-  let isSplitted = options.isSplitted;
+const stackStateToTab = (state, options) => {
+  let {index} = state;
+
+  const currentRoute = state.routes[index];
+  if (currentRoute.name !== 'main') {
+    index = state.routeNames.indexOf(currentRoute.name);
+  } else if (options.initialRouteName) {
+    index = state.routeNames.indexOf(options.initialRouteName);
+  }
+
+  const routes = state.routeNames.map(name => {
+    return (
+      state.routes.find(({name: routeName}) => routeName === name) || {
+        name,
+        key: `${name}-${nanoid()}`,
+      }
+    );
+  });
+
+  return {
+    ...state,
+    index,
+    routes,
+    history: [],
+  };
+};
+
+const tabStateToStack = (state, options) => {
+  let {index} = state;
+  const mainRoute = state.routes.find(({name}) => name === 'main') || {
+    name: 'main',
+    key: `main-${nanoid()}`,
+  };
+  let routes;
+  const currentRoute = state.routes[index];
+  if (currentRoute.name === 'main') {
+    index = 0;
+    routes = [mainRoute];
+  } else {
+    index = 1;
+    routes = [mainRoute, currentRoute];
+  }
+  return {
+    ...state,
+    index,
+    routes,
+  };
+};
+
+export function SurfSplitRouter(routerOptions) {
+  const tabRouter = TabRouter(routerOptions);
+  const stackRouter = StackRouter(routerOptions);
+  let isSplitted = routerOptions.isSplitted;
   let isInitialized = false;
-  let initialRouteName = options.initialRouteName;
+  let initialRouteName = routerOptions.initialRouteName;
   const router = {
     ...BaseRouter,
 
@@ -28,41 +77,44 @@ export function SurfSplitRouter(options) {
       return newState;
     },
 
-    getStateAfterSplitting(state) {
-      if (isSplitted) {
-        const routeName = state.routeNames[state.index];
-        if (routeName === 'main') {
-          let routeIndex;
-          if (initialRouteName) {
-            routeIndex = state.routeNames.indexOf(initialRouteName);
-          } else {
-            routeIndex = state.index + 1;
-          }
-          state.index = routeIndex;
-        }
-
-        return state;
-      }
-      const mainRoute = state.routes.find(({name}) => name === 'main');
-      if (!mainRoute) {
-        state.index = state.index + 1;
-        state.routes = [{name: 'main', key: `main-${nanoid()}`}].concat(
-          state.routes,
-        );
-      }
-      return state;
-    },
-
-    getRehydratedState(...args) {
+    getRehydratedState(state, params) {
+      const isStale = state.stale;
       let newState;
 
-      if (isSplitted) {
-        newState = tabRouter.getRehydratedState(...args);
-      } else {
-        newState = stackRouter.getRehydratedState(...args);
+      if (isStale === false) {
+        return state;
       }
 
-      newState = this.getStateAfterSplitting(newState);
+      if (isSplitted) {
+        newState = tabRouter.getRehydratedState(state, params);
+
+        // Move from "main" route in splitted version
+        const currentRouteName = newState.routeNames[newState.index];
+        if (currentRouteName === 'main') {
+          if (routerOptions.initialRouteName) {
+            newState.index = newState.routeNames.indexOf(
+              routerOptions.initialRouteName,
+            );
+          } else {
+            newState.index = newState.index + 1;
+          }
+        }
+      } else {
+        newState = stackRouter.getRehydratedState(state, params);
+
+        const mainRoute = newState.routes.find(({name}) => name === 'main') || {
+          name: 'main',
+          key: `main-${nanoid()}`,
+        };
+        const currentRoute = newState.routes[newState.index];
+        if (currentRoute.name === 'main') {
+          newState.index = 0;
+          newState.routes = [mainRoute];
+        } else {
+          newState.index = 1;
+          newState.routes = [mainRoute, currentRoute];
+        }
+      }
 
       Object.assign(newState, {type: router.type});
       return newState;
@@ -93,18 +145,15 @@ export function SurfSplitRouter(options) {
           isInitialized = true;
           return state;
         }
-        state.stale = true;
 
         if (action.initialRouteName) {
           initialRouteName = action.initialRouteName;
         }
 
-        state.routes = state.routes.slice(0, state.index);
-        const newState = this.getRehydratedState(state, {
-          routeNames: state.routeNames,
-          routeParamList: {},
-        });
-        return newState;
+        if (isSplitted) {
+          return stackStateToTab(state, routerOptions);
+        }
+        return tabStateToStack(state, routerOptions);
       }
 
       const newState = isSplitted

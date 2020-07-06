@@ -48,6 +48,7 @@ export const SurfSplitNavigator = ({
       isSplitted,
     },
   );
+
   React.useEffect(() => {
     navigation.dispatch(
       SurfSplitActions.setSplitted(
@@ -98,7 +99,7 @@ export const SurfSplitNavigator = ({
   }
   return (
     <StackView
-      state={{...state, type: 'stack'}}
+      state={state}
       navigation={navigation}
       descriptors={descriptors}
     />
