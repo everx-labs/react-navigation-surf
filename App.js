@@ -59,7 +59,16 @@ const App: () => React$Node = () => {
 
   return (
     <NavigationContainer ref={navRef} linking={['/']}>
-      <SurfSplit.Navigator initialRouteName="first">
+      <SurfSplit.Navigator
+        initialRouteName="first"
+        screenOptions={{
+          splitStyles: {
+            body: styles.body,
+            main: styles.main,
+            detail: styles.detail,
+          },
+        }}
+        mainWidth={600}>
         <SurfSplit.Screen name="main" component={Main} />
         <SurfSplit.Screen name="first" component={Detail1} />
         <SurfSplit.Screen name="second" component={Detail2} />
@@ -69,6 +78,22 @@ const App: () => React$Node = () => {
 };
 
 const styles = StyleSheet.create({
+  body: {
+    flex: 1,
+    flexDirection: 'row',
+    padding: 10,
+  },
+  main: {
+    backgroundColor: 'white',
+    minWidth: 300,
+    marginRight: 10,
+    borderRadius: 5,
+  },
+  detail: {
+    backgroundColor: 'white',
+    flex: 1,
+    borderRadius: 5,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
