@@ -41,6 +41,10 @@ module.exports = {
                     // path.resolve(__dirname, './node_modules/@react-navigation/'),
                     path.resolve(
                         __dirname,
+                        './node_modules/react-navigation-surf/',
+                    ),
+                    path.resolve(
+                        __dirname,
                         './node_modules/react-native-gesture-handler/',
                     ),
                 ],

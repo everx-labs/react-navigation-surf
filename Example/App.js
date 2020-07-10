@@ -21,14 +21,6 @@ const Main = ({ navigation }) => (
         <Text style={styles.title}>Main</Text>
         <Button onPress={() => navigation.navigate('first')} title="Go to 1" />
         <Button onPress={() => navigation.navigate('second')} title="Go to 2" />
-        <Button
-            onPress={() =>
-                navigation.navigate('first', {
-                    params: { test: 'hello' },
-                })
-            }
-            title="Go to first with params"
-        />
     </SafeAreaView>
 );
 
