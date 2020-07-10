@@ -5,10 +5,14 @@ module.exports = {
         'airbnb',
         'plugin:flowtype/recommended',
     ],
-    plugins: ['flowtype', 'detox'],
+    plugins: ['flowtype'],
     rules: {
+        'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
         'react/jsx-indent-props': [1, 4],
         'react/jsx-indent': ['error', 4],
+        'react/prop-types': 'off',
+        'react/require-default-props': 'off',
+        'react-hooks/exhaustive-deps': 'off',
         indent: ['error', 4, { SwitchCase: 1 }],
         'no-use-before-define': ['error', { variables: false }],
         'arrow-body-style': 'off',
@@ -20,6 +24,7 @@ module.exports = {
         'import/prefer-default-export': 'off',
         'import/no-cycle': [2, { maxDepth: 1 }],
         'function-paren-newline': ['error', 'consistent'],
+        'operator-linebreak': 'off',
         'jsx-a11y/anchor-is-valid': [
             'warn',
             {
@@ -27,6 +32,8 @@ module.exports = {
             },
         ],
         'flowtype/space-after-type-colon': 'off',
+        'flowtype/generic-spacing': 'off',
         'quote-props': 'off',
+        'implicit-arrow-linebreak': 'off',
     },
 };

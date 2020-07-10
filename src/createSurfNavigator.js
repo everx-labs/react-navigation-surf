@@ -1,18 +1,11 @@
 // @flow strict-local
 import * as React from 'react';
-import {
-    useWindowDimensions,
-    StyleSheet,
-    View,
-    Text,
-    Dimensions,
-} from 'react-native';
+import { useWindowDimensions, StyleSheet, View } from 'react-native';
 import type { ViewStyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import {
     NavigationHelpersContext,
     useNavigationBuilder,
     createNavigatorFactory,
-    TabRouter,
 } from '@react-navigation/native';
 import { StackView } from '@react-navigation/stack';
 // $FlowExpectedError
@@ -27,11 +20,11 @@ type SurfSplitNavigatorProps = {|
     initialRouteName: string,
     mainWidth: number,
     screenOptions: {
-        splitStyles?: {
-            body: ViewStyleProp,
-            main: ViewStyleProp,
-            detail: ViewStyleProp,
-        },
+        splitStyles?: {|
+            body?: ViewStyleProp,
+            main?: ViewStyleProp,
+            detail?: ViewStyleProp,
+        |},
         headerShown?: boolean,
         ...
     },
@@ -47,21 +40,20 @@ export const SurfSplitNavigator = ({
     const isSplitted = getIsSplitted(dimensions, mainWidth);
 
     const {
-        splitStyles,
+        splitStyles: splitStylesFromOptions,
         headerShown,
         ...restScreenOptions
-    } = screenOptions || {
-        splitStyles: {
-            body: styles.body,
-            main: styles.main,
-            detail: styles.detail,
-        },
+    } = screenOptions;
+    const splitStyles = splitStylesFromOptions || {
+        body: styles.body,
+        main: styles.main,
+        detail: styles.detail,
     };
     const { state, navigation, descriptors } = useNavigationBuilder(
         SurfSplitRouter,
         {
             children,
-            initialRouteName: initialRouteName,
+            initialRouteName,
             screenOptions: {
                 ...restScreenOptions,
                 headerShown: false,
@@ -89,8 +81,11 @@ export const SurfSplitNavigator = ({
 
     if (isSplitted) {
         const mainRoute = state.routes.find(({ name }) => name === 'main');
+        if (mainRoute == null) {
+            throw new Error(`You should provide ${'main'} screen!`);
+        }
         return (
-            <NavigationHelpersContext.Provider>
+            <NavigationHelpersContext.Provider value={navigation}>
                 <View style={splitStyles.body}>
                     <View style={splitStyles.main}>
                         {descriptors[mainRoute.key].render()}
@@ -123,6 +118,7 @@ export const SurfSplitNavigator = ({
         );
     }
     return (
+        // $FlowExpectedError
         <StackView
             state={state}
             navigation={navigation}
@@ -131,7 +127,9 @@ export const SurfSplitNavigator = ({
     );
 };
 
+// $FlowFixMe
 export const createSurfSplitNavigator = createNavigatorFactory(
+    // $FlowFixMe
     SurfSplitNavigator,
 );
 

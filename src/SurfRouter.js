@@ -48,7 +48,7 @@ const stackStateToTab = (state, options: SurfRouterOptions) => {
     };
 };
 
-const tabStateToStack = (state, options: SurfRouterOptions) => {
+const tabStateToStack = state => {
     let { index } = state;
     const mainRoute = state.routes.find(
         ({ name }) => name === MAIN_SCREEN_NAME,
@@ -77,12 +77,13 @@ export const SurfSplitRouter: RouterFactory<
     GenericNavigationAction,
     SurfRouterOptions,
 > = routerOptions => {
+    // eslint-disable-next-line prefer-const
     let { isSplitted, ...tabOptions } = routerOptions;
     const { backBehavior, ...stackOptions } = tabOptions;
     const tabRouter = TabRouter(tabOptions);
     const stackRouter = StackRouter(stackOptions);
     let isInitialized = false;
-    let initialRouteName = routerOptions.initialRouteName;
+    let { initialRouteName } = routerOptions;
     const router = {
         // $FlowExpectedError
         ...BaseRouter,
@@ -117,7 +118,7 @@ export const SurfSplitRouter: RouterFactory<
                             routerOptions.initialRouteName,
                         );
                     } else {
-                        newState.index = newState.index + 1;
+                        newState.index += 1;
                     }
                 }
             } else {
@@ -176,7 +177,7 @@ export const SurfSplitRouter: RouterFactory<
                 if (isSplitted) {
                     return stackStateToTab(state, routerOptions);
                 }
-                return tabStateToStack(state, routerOptions);
+                return tabStateToStack(state);
             }
 
             const newState = isSplitted

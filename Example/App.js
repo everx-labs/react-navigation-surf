@@ -3,7 +3,7 @@
  * https://github.com/facebook/react-native
  *
  * @format
- * @flow strict-local
+ * @flow
  */
 
 import 'react-native-gesture-handler';
@@ -12,7 +12,6 @@ import { StyleSheet, View, Text, Button, SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useReduxDevToolsExtension } from '@react-navigation/devtools';
-
 import { createSurfSplitNavigator } from 'react-navigation-surf';
 
 const SurfSplit = createSurfSplitNavigator();
@@ -24,7 +23,9 @@ const Main = ({ navigation }) => (
         <Button onPress={() => navigation.navigate('second')} title="Go to 2" />
         <Button
             onPress={() =>
-                navigation.navigate('first', { params: { test: 'hello' } })
+                navigation.navigate('first', {
+                    params: { test: 'hello' },
+                })
             }
             title="Go to first with params"
         />
@@ -64,7 +65,7 @@ const App: () => React$Node = () => {
     useReduxDevToolsExtension(navRef);
 
     return (
-        <NavigationContainer ref={navRef} linking={['/']}>
+        <NavigationContainer ref={navRef} linking={{ prefixes: ['/'] }}>
             <SurfSplit.Navigator
                 initialRouteName="first"
                 screenOptions={{
