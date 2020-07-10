@@ -1,7 +1,11 @@
 // @flow strict-local
 import * as React from 'react';
-import { useWindowDimensions, StyleSheet, View } from 'react-native';
-import type { ViewStyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
+import {
+    useWindowDimensions as useWindowDimensionsNative,
+    StyleSheet,
+    View,
+    Dimensions,
+} from 'react-native';
 import {
     NavigationHelpersContext,
     useNavigationBuilder,
@@ -14,6 +18,37 @@ import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/
 import { SurfSplitRouter, SurfSplitActions } from './SurfRouter';
 
 const getIsSplitted = ({ width }, mainWidth) => width > mainWidth;
+
+const useWindowDimensions =
+    useWindowDimensionsNative ||
+    function useWindowDimensionsFallback() {
+        const [dimensions, setDimensions] = React.useState(() =>
+            Dimensions.get('window'),
+        );
+
+        React.useEffect(() => {
+            function handleChange({ window }) {
+                if (
+                    dimensions.width !== window.width ||
+                    dimensions.height !== window.height ||
+                    dimensions.scale !== window.scale ||
+                    dimensions.fontScale !== window.fontScale
+                ) {
+                    setDimensions(window);
+                }
+            }
+            Dimensions.addEventListener('change', handleChange);
+            // We might have missed an update between calling `get` in render and
+            // `addEventListener` in this handler, so we set it here. If there was
+            // no change, React will filter out this update as a no-op.
+            handleChange({ window: Dimensions.get('window') });
+            return () => {
+                Dimensions.removeEventListener('change', handleChange);
+            };
+        }, [dimensions]);
+
+        return dimensions;
+    };
 
 type SurfSplitNavigatorProps = {|
     +children?: React.Node,
@@ -43,7 +78,7 @@ export const SurfSplitNavigator = ({
         splitStyles: splitStylesFromOptions,
         headerShown,
         ...restScreenOptions
-    } = screenOptions;
+    } = screenOptions || {};
     const splitStyles = splitStylesFromOptions || {
         body: styles.body,
         main: styles.main,
