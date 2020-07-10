@@ -8,9 +8,17 @@ import type {
     TabRouterOptions,
 } from '@react-navigation/native';
 
+const SURF_ACTION_TYPES = {
+    SET_SPLITTED: 'SET_SPLITTED',
+};
+
 export const SurfSplitActions = {
     setSplitted(isSplitted: boolean, initialRouteName: string) {
-        return { type: 'SET_SPLITTED', isSplitted, initialRouteName };
+        return {
+            type: SURF_ACTION_TYPES.SET_SPLITTED,
+            isSplitted,
+            initialRouteName,
+        };
     },
 };
 
@@ -88,6 +96,10 @@ export const SurfSplitRouter: RouterFactory<
         // $FlowExpectedError
         ...BaseRouter,
 
+        // Every router in react-navigation should have a type
+        // And it should be consistent between re-renders
+        // Or library will try to re-initialize the state
+        // with every re-render
         type: 'surf',
 
         getInitialState(...args) {
@@ -163,7 +175,7 @@ export const SurfSplitRouter: RouterFactory<
         },
 
         getStateForAction(state, action, options) {
-            if (action.type === 'SET_SPLITTED') {
+            if (action.type === SURF_ACTION_TYPES.SET_SPLITTED) {
                 isSplitted = action.isSplitted;
                 if (!isInitialized) {
                     isInitialized = true;
