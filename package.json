@@ -9,8 +9,7 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint src && flow src",
-    "peers": "npx npm-install-peers",
-    "postinstall": "npx flow-typed install @react-navigation/core@5.x.x @react-navigation/native@5.x.x @react-navigation/bottom-tabs@5.x.x @react-navigation/stack@5.x.x && cp -r flow-typed Example/flow-typed"
+    "dev-install": "npx npm-install-peers && npx flow-typed install @react-navigation/core@5.x.x @react-navigation/native@5.x.x @react-navigation/bottom-tabs@5.x.x @react-navigation/stack@5.x.x && cp -r flow-typed Example/flow-typed"
   },
   "peerDependencies": {
     "react": "^16.11.0",
