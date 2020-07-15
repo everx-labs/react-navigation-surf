@@ -86,12 +86,17 @@ export const SurfSplitRouter: RouterFactory<
     SurfRouterOptions,
 > = routerOptions => {
     // eslint-disable-next-line prefer-const
-    let { isSplitted, ...tabOptions } = routerOptions;
+    let { isSplitted, initialRouteName, ...tabOptions } = routerOptions;
     const { backBehavior, ...stackOptions } = tabOptions;
-    const tabRouter = TabRouter(tabOptions);
-    const stackRouter = StackRouter(stackOptions);
+    const tabRouter = TabRouter({
+        ...tabOptions,
+        initialRouteName,
+    });
+    const stackRouter = StackRouter({
+        ...stackOptions,
+        initialRouteName: MAIN_SCREEN_NAME,
+    });
     let isInitialized = false;
-    let { initialRouteName } = routerOptions;
     const router = {
         // $FlowExpectedError
         ...BaseRouter,
@@ -102,10 +107,51 @@ export const SurfSplitRouter: RouterFactory<
         // with every re-render
         type: 'surf',
 
-        getInitialState(...args) {
-            const newState = isSplitted
-                ? tabRouter.getInitialState(...args)
-                : stackRouter.getInitialState(...args);
+        ensureTabState(newState, params) {
+            // Move from "main" route in splitted version
+            const currentRouteName = newState.routeNames[newState.index];
+            if (currentRouteName === MAIN_SCREEN_NAME) {
+                if (initialRouteName != null) {
+                    newState.index = newState.routeNames.indexOf(
+                        routerOptions.initialRouteName,
+                    );
+                } else {
+                    newState.index += 1;
+                }
+            }
+
+            return newState;
+        },
+
+        ensureStackState(newState, params) {
+            const mainRoute = newState.routes.find(
+                ({ name }) => name === MAIN_SCREEN_NAME,
+            ) || {
+                name: MAIN_SCREEN_NAME,
+                key: `${MAIN_SCREEN_NAME}-${nanoid()}`,
+            };
+            const currentRoute = newState.routes[newState.index];
+            if (currentRoute.name === MAIN_SCREEN_NAME) {
+                newState.index = 0;
+                newState.routes = [mainRoute];
+            } else {
+                newState.index = 1;
+                newState.routes = [mainRoute, currentRoute];
+            }
+
+            return newState;
+        },
+
+        getInitialState(params) {
+            let newState;
+
+            if (isSplitted) {
+                newState = tabRouter.getInitialState(params);
+                newState = this.ensureTabState(newState, params);
+            } else {
+                newState = stackRouter.getInitialState(params);
+                newState = this.ensureStackState(newState, params);
+            }
 
             Object.assign(newState, { type: router.type });
             return newState;
@@ -121,35 +167,10 @@ export const SurfSplitRouter: RouterFactory<
 
             if (isSplitted) {
                 newState = tabRouter.getRehydratedState(state, params);
-
-                // Move from "main" route in splitted version
-                const currentRouteName = newState.routeNames[newState.index];
-                if (currentRouteName === MAIN_SCREEN_NAME) {
-                    if (initialRouteName != null) {
-                        newState.index = newState.routeNames.indexOf(
-                            routerOptions.initialRouteName,
-                        );
-                    } else {
-                        newState.index += 1;
-                    }
-                }
+                newState = this.ensureTabState(newState, params);
             } else {
                 newState = stackRouter.getRehydratedState(state, params);
-
-                const mainRoute = newState.routes.find(
-                    ({ name }) => name === MAIN_SCREEN_NAME,
-                ) || {
-                    name: MAIN_SCREEN_NAME,
-                    key: `${MAIN_SCREEN_NAME}-${nanoid()}`,
-                };
-                const currentRoute = newState.routes[newState.index];
-                if (currentRoute.name === MAIN_SCREEN_NAME) {
-                    newState.index = 0;
-                    newState.routes = [mainRoute];
-                } else {
-                    newState.index = 1;
-                    newState.routes = [mainRoute, currentRoute];
-                }
+                newState = this.ensureStackState(newState, params);
             }
 
             Object.assign(newState, { type: router.type });
@@ -175,6 +196,7 @@ export const SurfSplitRouter: RouterFactory<
         },
 
         getStateForAction(state, action, options) {
+            let newState;
             if (action.type === SURF_ACTION_TYPES.SET_SPLITTED) {
                 isSplitted = action.isSplitted;
                 if (!isInitialized) {
@@ -187,14 +209,15 @@ export const SurfSplitRouter: RouterFactory<
                 }
 
                 if (isSplitted) {
-                    return stackStateToTab(state, routerOptions);
+                    newState = stackStateToTab(state, routerOptions);
+                } else {
+                    newState = tabStateToStack(state);
                 }
-                return tabStateToStack(state);
+            } else {
+                newState = isSplitted
+                    ? tabRouter.getStateForAction(state, action, options)
+                    : stackRouter.getStateForAction(state, action, options);
             }
-
-            const newState = isSplitted
-                ? tabRouter.getStateForAction(state, action, options)
-                : stackRouter.getStateForAction(state, action, options);
 
             // $FlowFixMe
             Object.assign(newState, { type: router.type });
