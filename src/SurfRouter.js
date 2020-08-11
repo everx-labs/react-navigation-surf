@@ -217,6 +217,10 @@ export const SurfSplitRouter: RouterFactory<
                 newState = isSplitted
                     ? tabRouter.getStateForAction(state, action, options)
                     : stackRouter.getStateForAction(state, action, options);
+
+                if (newState == null) {
+                    return null;
+                }
             }
 
             // $FlowFixMe
