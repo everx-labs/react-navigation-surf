@@ -155,6 +155,7 @@ export const SurfSplitNavigator = ({
     return (
         // $FlowExpectedError
         <StackView
+            headerMode="none"
             state={state}
             navigation={navigation}
             descriptors={descriptors}
