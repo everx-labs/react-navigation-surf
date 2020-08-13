@@ -12,6 +12,7 @@ import {
     createNavigatorFactory,
 } from '@react-navigation/native';
 import { StackView } from '@react-navigation/stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 // $FlowExpectedError
 import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
 
@@ -121,34 +122,36 @@ export const SurfSplitNavigator = ({
         }
         return (
             <NavigationHelpersContext.Provider value={navigation}>
-                <View style={splitStyles.body}>
-                    <View style={splitStyles.main}>
-                        {descriptors[mainRoute.key].render()}
-                    </View>
-                    <View style={splitStyles.detail}>
-                        {state.routes.map((route, index) => {
-                            const descriptor = descriptors[route.key];
-                            const isFocused = state.index === index;
+                <SafeAreaProvider>
+                    <View style={splitStyles.body}>
+                        <View style={splitStyles.main}>
+                            {descriptors[mainRoute.key].render()}
+                        </View>
+                        <View style={splitStyles.detail}>
+                            {state.routes.map((route, index) => {
+                                const descriptor = descriptors[route.key];
+                                const isFocused = state.index === index;
 
-                            if (
-                                !isSplitted &&
-                                !loadedRef.current.includes(index)
-                            ) {
-                                return null;
-                            }
+                                if (
+                                    !isSplitted &&
+                                    !loadedRef.current.includes(index)
+                                ) {
+                                    return null;
+                                }
 
-                            return (
-                                <ResourceSavingScene
-                                    key={route.key}
-                                    style={StyleSheet.absoluteFill}
-                                    isVisible={isFocused}
-                                >
-                                    {descriptor.render()}
-                                </ResourceSavingScene>
-                            );
-                        })}
+                                return (
+                                    <ResourceSavingScene
+                                        key={route.key}
+                                        style={StyleSheet.absoluteFill}
+                                        isVisible={isFocused}
+                                    >
+                                        {descriptor.render()}
+                                    </ResourceSavingScene>
+                                );
+                            })}
+                        </View>
                     </View>
-                </View>
+                </SafeAreaProvider>
             </NavigationHelpersContext.Provider>
         );
     }
