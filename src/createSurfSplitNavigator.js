@@ -6,6 +6,7 @@ import {
     View,
     Dimensions,
 } from 'react-native';
+import type { ViewStyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import {
     NavigationHelpersContext,
     useNavigationBuilder,
@@ -16,7 +17,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 // $FlowExpectedError
 import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
 
-import { SurfSplitRouter, SurfSplitActions } from './SurfRouter';
+import { SurfSplitRouter, SurfSplitActions } from './SurfSplitRouter';
 
 const getIsSplitted = ({ width }, mainWidth) => width > mainWidth;
 

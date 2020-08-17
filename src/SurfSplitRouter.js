@@ -7,6 +7,10 @@ import type {
     GenericNavigationAction,
     TabRouterOptions,
 } from '@react-navigation/native';
+import type {
+    StackNavigationState,
+    TabNavigationState,
+} from '@react-navigation/core';
 
 const SURF_ACTION_TYPES = {
     SET_SPLITTED: 'SET_SPLITTED',
@@ -105,9 +109,9 @@ export const SurfSplitRouter: RouterFactory<
         // And it should be consistent between re-renders
         // Or library will try to re-initialize the state
         // with every re-render
-        type: 'surf',
+        type: 'surf-split',
 
-        ensureTabState(newState, params) {
+        ensureTabState(newState: TabNavigationState) {
             // Move from "main" route in splitted version
             const currentRouteName = newState.routeNames[newState.index];
             if (currentRouteName === MAIN_SCREEN_NAME) {
@@ -123,7 +127,7 @@ export const SurfSplitRouter: RouterFactory<
             return newState;
         },
 
-        ensureStackState(newState, params) {
+        ensureStackState(newState: StackNavigationState) {
             const mainRoute = newState.routes.find(
                 ({ name }) => name === MAIN_SCREEN_NAME,
             ) || {
