@@ -9,7 +9,6 @@ import {
     useNavigationBuilder,
     createNavigatorFactory,
 } from '@react-navigation/native';
-// $FlowExpectedError
 import type {
     Descriptor,
     RouteProp,
