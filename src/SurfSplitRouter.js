@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 // @flow strict-local
 import { nanoid } from 'nanoid/non-secure';
 import { BaseRouter, StackRouter, TabRouter } from '@react-navigation/native';
@@ -26,7 +27,7 @@ export const SurfSplitActions = {
     },
 };
 
-const MAIN_SCREEN_NAME = 'main';
+export const MAIN_SCREEN_NAME = 'main';
 
 type SurfRouterOptions = {|
     ...TabRouterOptions,

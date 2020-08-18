@@ -17,7 +17,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 // $FlowExpectedError
 import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
 
-import { SurfSplitRouter, SurfSplitActions } from './SurfSplitRouter';
+import {
+    SurfSplitRouter,
+    SurfSplitActions,
+    MAIN_SCREEN_NAME,
+} from './SurfSplitRouter';
 
 const getIsSplitted = ({ width }, mainWidth) => width > mainWidth;
 
@@ -103,7 +107,7 @@ export const SurfSplitNavigator = ({
         navigation.dispatch(
             SurfSplitActions.setSplitted(
                 isSplitted,
-                isSplitted ? initialRouteName : 'main',
+                isSplitted ? initialRouteName : MAIN_SCREEN_NAME,
             ),
         );
     }, [isSplitted]);
@@ -117,9 +121,11 @@ export const SurfSplitNavigator = ({
     }, [state]);
 
     if (isSplitted) {
-        const mainRoute = state.routes.find(({ name }) => name === 'main');
+        const mainRoute = state.routes.find(
+            ({ name }) => name === MAIN_SCREEN_NAME,
+        );
         if (mainRoute == null) {
-            throw new Error(`You should provide ${'main'} screen!`);
+            throw new Error(`You should provide ${MAIN_SCREEN_NAME} screen!`);
         }
         return (
             <NavigationHelpersContext.Provider value={navigation}>

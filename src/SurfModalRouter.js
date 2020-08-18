@@ -255,7 +255,7 @@ export const SurfModalRouter: RouterFactory<
                             let order = route.order ?? 0;
                             let params = {
                                 ...route.params,
-                                isShown: order > 0,
+                                visible: order > 0,
                             };
 
                             if (modalRouteIndex === i) {
@@ -266,7 +266,7 @@ export const SurfModalRouter: RouterFactory<
                                     modalRouteConfig?.defaultProps,
                                     modalRoute.params,
                                     action.payload.params,
-                                    { isShown: true },
+                                    { visible: true },
                                 );
                             }
 
@@ -305,7 +305,7 @@ export const SurfModalRouter: RouterFactory<
                                 order: 0,
                                 params: {
                                     ...route.params,
-                                    isShown: false,
+                                    visible: false,
                                 },
                             };
                         }
@@ -343,7 +343,7 @@ export const SurfModalRouter: RouterFactory<
                                 order: 0,
                                 params: {
                                     ...route,
-                                    isShown: false,
+                                    visible: false,
                                 },
                             };
                         }

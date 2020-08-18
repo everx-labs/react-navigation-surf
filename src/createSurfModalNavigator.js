@@ -1,4 +1,6 @@
 // @flow
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable react/state-in-constructor */
 /* eslint-disable max-classes-per-file */
 import * as React from 'react';
 import { Keyboard } from 'react-native';
@@ -16,17 +18,18 @@ import type {
     EventMapBase,
     ExtraNavigatorPropsBase,
 } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SurfModalRouter, SurfModalActions } from './SurfModalRouter';
 import type { SurfModalNavigationState } from './SurfModalRouter';
 
-type ModalControllerProps = {
+type SurfModalControllerProps = {
     state: SurfModalNavigationState,
     descriptors: {| +[key: string]: Descriptor<empty, empty> |},
     navigation: NavigationProp<ParamListBase>,
 };
 
-export class SurfModalController extends React.Component<ModalControllerProps> {
+export class SurfModalController extends React.Component<SurfModalControllerProps> {
     static instance: ?SurfModalController;
 
     static show(name: string, params?: { [key: string]: mixed }) {
@@ -76,14 +79,15 @@ type ModalSceneWrapperProps = {
     navigation: NavigationProp<ParamListBase>,
     route: RouteProp<*, *>,
 };
+
 type ModalSceneWrapperState = {
-    isShown: boolean,
+    visible: boolean,
     needToHide: boolean,
     needToShow: boolean,
 };
 
 type ModalSceneInstance = {
-    +show: (params: { [key: string]: any }) => void | Promise<void>,
+    +show: (params: { [key: string]: mixed }) => void | Promise<void>,
     +hide: () => void,
 };
 
@@ -101,19 +105,19 @@ export const withModalSceneWrapper = (
             props: ModalSceneWrapperProps,
             state: ModalSceneWrapperState,
         ) {
-            const { isShown } = props.route?.params || {};
-            if (state.isShown && !isShown) {
+            const { visible } = props.route?.params || {};
+            if (state.visible && !visible) {
                 return {
                     needToShow: false,
                     needToHide: true,
-                    isShown: false,
+                    visible: false,
                 };
             }
-            if (!state.isShown && isShown) {
+            if (!state.visible && visible) {
                 return {
                     needToHide: false,
                     needToShow: true,
-                    isShown: true,
+                    visible: true,
                 };
             }
             return {
@@ -124,7 +128,7 @@ export const withModalSceneWrapper = (
         }
 
         state = {
-            isShown: false,
+            visible: false,
             needToHide: false,
             needToShow: false,
         };
@@ -176,13 +180,15 @@ const ModalNavigator = ({
 
     return (
         <NavigationHelpersContext.Provider value={navigation}>
-            <SurfModalController
-                descriptors={descriptors}
-                state={state}
-                navigation={navigation}
-            >
-                {children}
-            </SurfModalController>
+            <SafeAreaProvider>
+                <SurfModalController
+                    descriptors={descriptors}
+                    state={state}
+                    navigation={navigation}
+                >
+                    {children}
+                </SurfModalController>
+            </SafeAreaProvider>
         </NavigationHelpersContext.Provider>
     );
 };
