@@ -26,8 +26,9 @@
     "react-native-screens": "^2.9.0",
     "react-native-web": "^0.13.0",
     "react-native-web-image-loader": "^0.1.1",
-    "style-loader": "^1.2.1",
-    "react-navigation-surf": "git+ssh://github.com/tonlabs/react-navigation-surf.git"
+    "react-native-web-modal": "^1.0.1",
+    "react-navigation-surf": "git+ssh://github.com/tonlabs/react-navigation-surf.git",
+    "style-loader": "^1.2.1"
   },
   "devDependencies": {
     "@babel/cli": "7.8.4",
