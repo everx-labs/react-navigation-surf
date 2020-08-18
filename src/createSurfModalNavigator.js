@@ -31,7 +31,7 @@ type SurfModalControllerProps = {
 export class SurfModalController extends React.Component<SurfModalControllerProps> {
     static instance: ?SurfModalController;
 
-    static show(name: string, params?: { [key: string]: mixed }) {
+    static show<Params: { [key: string]: any }>(name: string, params?: Params) {
         if (SurfModalController.instance) {
             SurfModalController.instance.show(name, params);
         }
@@ -51,7 +51,7 @@ export class SurfModalController extends React.Component<SurfModalControllerProp
         SurfModalController.instance = null;
     }
 
-    show(name: string, params?: { [key: string]: mixed }) {
+    show<Params: { [key: string]: any }>(name: string, params?: Params) {
         Keyboard.dismiss();
         this.props.navigation.dispatch(SurfModalActions.show(name, params));
     }
@@ -86,7 +86,9 @@ type ModalSceneWrapperState = {
 };
 
 type ModalSceneInstance = {
-    +show: (params: { [key: string]: mixed }) => void | Promise<void>,
+    +show: <Params: { [key: string]: any }>(
+        params: Params,
+    ) => void | Promise<void>,
     +hide: () => void,
 };
 
