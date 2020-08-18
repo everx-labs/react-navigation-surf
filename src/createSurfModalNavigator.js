@@ -17,7 +17,6 @@ import type {
     EventMapBase,
     ExtraNavigatorPropsBase,
 } from '@react-navigation/native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SurfModalRouter, SurfModalActions } from './SurfModalRouter';
 import type { SurfModalNavigationState } from './SurfModalRouter';
@@ -181,15 +180,13 @@ const ModalNavigator = ({
 
     return (
         <NavigationHelpersContext.Provider value={navigation}>
-            <SafeAreaProvider>
-                <SurfModalController
-                    descriptors={descriptors}
-                    state={state}
-                    navigation={navigation}
-                >
-                    {children}
-                </SurfModalController>
-            </SafeAreaProvider>
+            <SurfModalController
+                descriptors={descriptors}
+                state={state}
+                navigation={navigation}
+            >
+                {children}
+            </SurfModalController>
         </NavigationHelpersContext.Provider>
     );
 };
