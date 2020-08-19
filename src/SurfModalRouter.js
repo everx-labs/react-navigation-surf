@@ -54,6 +54,7 @@ const MODAL_ACTION_TYPES = {
     NAVIGATE: 'NAVIGATE',
     SHOW: 'SHOW',
     HIDE: 'HIDE',
+    HIDE_ALL: 'HIDE_ALL',
     GO_BACK: 'GO_BACK',
 };
 
@@ -73,6 +74,11 @@ export const SurfModalActions = {
             payload: {
                 name,
             },
+        };
+    },
+    hideAll() {
+        return {
+            type: MODAL_ACTION_TYPES.HIDE_ALL,
         };
     },
 };
@@ -226,9 +232,9 @@ export const SurfModalRouter: RouterFactory<
 
         getStateForAction(state, action) {
             switch (action.type) {
-                case 'JUMP_TO':
-                case 'NAVIGATE':
-                case 'SHOW': {
+                case MODAL_ACTION_TYPES.JUMP_TO:
+                case MODAL_ACTION_TYPES.NAVIGATE:
+                case MODAL_ACTION_TYPES.SHOW: {
                     let modalRouteIndex;
 
                     if (action.type === 'NAVIGATE' && action.payload.key) {
@@ -288,7 +294,7 @@ export const SurfModalRouter: RouterFactory<
                     };
                 }
 
-                case 'HIDE': {
+                case MODAL_ACTION_TYPES.HIDE: {
                     const activeRouteIndex = state.routes.findIndex(
                         route => route.name === action.payload.name,
                     );
@@ -329,7 +335,23 @@ export const SurfModalRouter: RouterFactory<
                     };
                 }
 
-                case 'GO_BACK': {
+                case MODAL_ACTION_TYPES.HIDE_ALL: {
+                    const routes = state.routes.map(route => ({
+                        ...route,
+                        params: {
+                            ...route.params,
+                            visible: false,
+                        },
+                    }));
+
+                    return {
+                        ...state,
+                        routes,
+                        index: 0,
+                    };
+                }
+
+                case MODAL_ACTION_TYPES.GO_BACK: {
                     const activeRoute = getRouteWithHighestOrder(state.routes);
 
                     if (activeRoute == null) {
