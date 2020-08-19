@@ -42,6 +42,12 @@ export class SurfModalController extends React.Component<SurfModalControllerProp
         }
     }
 
+    static hideAll() {
+        if (SurfModalController.instance) {
+            SurfModalController.instance.hideAll();
+        }
+    }
+
     componentDidMount() {
         SurfModalController.instance = this;
     }
@@ -58,6 +64,11 @@ export class SurfModalController extends React.Component<SurfModalControllerProp
     hide(name: string) {
         Keyboard.dismiss();
         this.props.navigation.dispatch(SurfModalActions.hide(name));
+    }
+
+    hideAll() {
+        Keyboard.dismiss();
+        this.props.navigation.dispatch(SurfModalActions.hideAll());
     }
 
     render() {
