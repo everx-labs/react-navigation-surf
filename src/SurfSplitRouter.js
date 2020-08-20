@@ -57,7 +57,7 @@ const stackStateToTab = (state, options: SurfRouterOptions) => {
         ...state,
         index,
         routes,
-        history: [],
+        history: [currentRoute],
     };
 };
 
