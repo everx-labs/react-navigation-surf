@@ -19,10 +19,7 @@ const getModalConfigsFromChildren = (
 ): ModalScreenProps[] => {
     const configs = React.Children.toArray(children).reduce((acc, child) => {
         if (React.isValidElement(child)) {
-            if (
-                typeof child.type === 'function' &&
-                child.type.name === 'Screen'
-            ) {
+            if (child.props.name != null) {
                 acc.push({
                     name: child.props.name,
                     defaultProps: child.props.options?.defaultProps,
