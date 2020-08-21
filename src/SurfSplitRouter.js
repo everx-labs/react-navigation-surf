@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 // @flow strict-local
+// $FlowExpectedError (can't find nanoid for some reason)
 import { nanoid } from 'nanoid/non-secure';
 import { BaseRouter, StackRouter, TabRouter } from '@react-navigation/native';
 import type {
