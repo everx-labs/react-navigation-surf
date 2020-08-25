@@ -2,7 +2,12 @@
 // @flow strict-local
 // $FlowExpectedError (can't find nanoid for some reason)
 import { nanoid } from 'nanoid/non-secure';
-import { BaseRouter, StackRouter, TabRouter } from '@react-navigation/native';
+import {
+    BaseRouter,
+    StackRouter,
+    TabRouter,
+    StackActions,
+} from '@react-navigation/native';
 import type {
     RouterFactory,
     GenericNavigationAction,
@@ -14,6 +19,7 @@ import type {
 } from '@react-navigation/core';
 
 const SURF_ACTION_TYPES = {
+    RESET_TO_INITIAL: 'RESET_TO_INITIAL',
     SET_SPLITTED: 'SET_SPLITTED',
 };
 
@@ -25,6 +31,11 @@ export const SurfSplitActions = {
                 isSplitted,
                 initialRouteName,
             },
+        };
+    },
+    resetToInitial() {
+        return {
+            type: SURF_ACTION_TYPES.RESET_TO_INITIAL,
         };
     },
 };
@@ -226,6 +237,28 @@ export const SurfSplitRouter: RouterFactory<
                     newState = stackStateToTab(state, routerOptions);
                 } else {
                     newState = tabStateToStack(state);
+                }
+            } else if (action.type === SURF_ACTION_TYPES.RESET_TO_INITIAL) {
+                if (isSplitted) {
+                    const initialRouteIndex = state.routes.findIndex(
+                        ({ name }) => name === initialRouteName,
+                    );
+
+                    if (initialRouteIndex === -1) {
+                        newState = state;
+                    } else {
+                        newState = {
+                            ...state,
+                            index: initialRouteIndex,
+                            history: [state.routes[initialRouteIndex]],
+                        };
+                    }
+                } else {
+                    newState = stackRouter.getStateForAction(
+                        state,
+                        StackActions.popToTop(),
+                        options,
+                    );
                 }
             } else {
                 newState = isSplitted
