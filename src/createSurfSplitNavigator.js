@@ -12,7 +12,14 @@ import {
     useNavigationBuilder,
     createNavigatorFactory,
 } from '@react-navigation/native';
+import type {
+    StackNavigationState,
+    GenericNavigationAction,
+    NavigationProp,
+    ParamListBase,
+} from '@react-navigation/native';
 import { StackView } from '@react-navigation/stack';
+import type { StackOptions } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 // $FlowExpectedError
 import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
@@ -21,6 +28,10 @@ import {
     SurfSplitRouter,
     SurfSplitActions,
     MAIN_SCREEN_NAME,
+} from './SurfSplitRouter';
+import type {
+    SurfSplitNavigationState,
+    SurfRouterOptions,
 } from './SurfSplitRouter';
 
 const getIsSplitted = ({ width }, mainWidth) => width > mainWidth;
@@ -80,28 +91,27 @@ export const SurfSplitNavigator = ({
     const dimensions = useWindowDimensions();
     const isSplitted = getIsSplitted(dimensions, mainWidth);
 
-    const {
-        splitStyles: splitStylesFromOptions,
-        headerShown,
-        ...restScreenOptions
-    } = screenOptions || {};
+    const { splitStyles: splitStylesFromOptions, ...restScreenOptions } =
+        screenOptions || {};
     const splitStyles = splitStylesFromOptions || {
         body: styles.body,
         main: styles.main,
         detail: styles.detail,
     };
-    const { state, navigation, descriptors } = useNavigationBuilder(
-        SurfSplitRouter,
-        {
-            children,
-            initialRouteName,
-            screenOptions: {
-                ...restScreenOptions,
-                headerShown: false,
-            },
-            isSplitted,
+    const { state, navigation, descriptors } = useNavigationBuilder<
+        SurfSplitNavigationState,
+        GenericNavigationAction,
+        StackOptions,
+        SurfRouterOptions,
+        NavigationProp<ParamListBase>,
+    >(SurfSplitRouter, {
+        children,
+        initialRouteName,
+        screenOptions: {
+            ...restScreenOptions,
         },
-    );
+        isSplitted,
+    });
 
     React.useEffect(() => {
         navigation.dispatch(
@@ -162,12 +172,20 @@ export const SurfSplitNavigator = ({
             </NavigationHelpersContext.Provider>
         );
     }
+
+    const stackState: StackNavigationState = {
+        ...state,
+        type: 'stack',
+    };
     return (
-        // $FlowExpectedError
         <StackView
             headerMode="none"
-            state={state}
+            state={stackState}
+            // we can't use StackNavigationProp 'cause we'd got errors in other places
+            // $FlowExpectedError
             navigation={navigation}
+            // we can't use StackNavigationProp 'cause we'd got errors in other places
+            // $FlowExpectedError
             descriptors={descriptors}
         />
     );

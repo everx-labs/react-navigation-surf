@@ -5,7 +5,6 @@ import { nanoid } from 'nanoid/non-secure';
 import { BaseRouter, StackRouter, TabRouter } from '@react-navigation/native';
 import type {
     RouterFactory,
-    NavigationState,
     GenericNavigationAction,
     TabRouterOptions,
 } from '@react-navigation/native';
@@ -22,15 +21,17 @@ export const SurfSplitActions = {
     setSplitted(isSplitted: boolean, initialRouteName: string) {
         return {
             type: SURF_ACTION_TYPES.SET_SPLITTED,
-            isSplitted,
-            initialRouteName,
+            payload: {
+                isSplitted,
+                initialRouteName,
+            },
         };
     },
 };
 
 export const MAIN_SCREEN_NAME = 'main';
 
-type SurfRouterOptions = {|
+export type SurfRouterOptions = {|
     ...TabRouterOptions,
     isSplitted: boolean,
 |};
@@ -86,8 +87,14 @@ const tabStateToStack = state => {
     };
 };
 
+export type SurfSplitNavigationState = {|
+    ...StackNavigationState,
+    ...TabNavigationState,
+    +type: 'surf-split',
+|};
+
 export const SurfSplitRouter: RouterFactory<
-    NavigationState,
+    SurfSplitNavigationState,
     GenericNavigationAction,
     SurfRouterOptions,
 > = routerOptions => {
@@ -204,14 +211,15 @@ export const SurfSplitRouter: RouterFactory<
         getStateForAction(state, action, options) {
             let newState;
             if (action.type === SURF_ACTION_TYPES.SET_SPLITTED) {
-                isSplitted = action.isSplitted;
+                isSplitted = action.payload.isSplitted;
+
                 if (!isInitialized) {
                     isInitialized = true;
                     return state;
                 }
 
-                if (action.initialRouteName) {
-                    initialRouteName = action.initialRouteName;
+                if (action.payload.initialRouteName) {
+                    initialRouteName = action.payload.initialRouteName;
                 }
 
                 if (isSplitted) {
