@@ -22,7 +22,7 @@ import { StackView } from '@react-navigation/stack';
 import type { StackOptions } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 // $FlowExpectedError
-import ResourceSavingScene from '@react-navigation/bottom-tabs/lib/module/views/ResourceSavingScene';
+import ResourceSavingScene from './ResourceSavingScene';
 
 import {
     SurfSplitRouter,
