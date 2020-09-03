@@ -308,7 +308,6 @@ export const SurfModalRouter: RouterFactory<
                                 ...route,
                                 order: 0,
                                 params: {
-                                    ...route.params,
                                     visible: false,
                                 },
                             };
