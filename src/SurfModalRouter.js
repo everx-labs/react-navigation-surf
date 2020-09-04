@@ -266,7 +266,7 @@ export const SurfModalRouter: RouterFactory<
                                 orderCounter += 1;
                                 order = orderCounter;
                                 params = Object.assign(
-                                    params,
+                                    {},
                                     modalRouteConfig?.defaultProps,
                                     action.payload.params,
                                     { visible: true },
