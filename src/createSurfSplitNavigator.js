@@ -5,6 +5,7 @@ import {
     StyleSheet,
     View,
     Dimensions,
+    Platform,
 } from 'react-native';
 import type { ViewStyleProp } from 'react-native/Libraries/StyleSheet/StyleSheet';
 import {
@@ -20,9 +21,11 @@ import type {
 } from '@react-navigation/native';
 import { StackView } from '@react-navigation/stack';
 import type { StackOptions } from '@react-navigation/stack';
+import { screensEnabled } from 'react-native-screens';
+import { NativeStackView } from 'react-native-screens/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ResourceSavingScene } from './ResourceSavingScene';
 
+import { ResourceSavingScene } from './ResourceSavingScene';
 import {
     SurfSplitRouter,
     SurfSplitActions,
@@ -108,6 +111,7 @@ export const SurfSplitNavigator = ({
         initialRouteName,
         screenOptions: {
             ...restScreenOptions,
+            headerShown: false,
         },
         isSplitted,
     });
@@ -176,6 +180,23 @@ export const SurfSplitNavigator = ({
         ...state,
         type: 'stack',
     };
+
+    // TODO: there could be issues on iOS with rendering
+    // need to check it and disable for iOS if it works badly
+    // if (Platform.OS === 'android' && screensEnabled()) {
+    if (Platform.OS !== 'web' && screensEnabled()) {
+        return (
+            <NativeStackView
+                state={stackState}
+                // we can't use StackNavigationProp 'cause we'd got errors in other places
+                // $FlowExpectedError
+                navigation={navigation}
+                // we can't use StackNavigationProp 'cause we'd got errors in other places
+                // $FlowExpectedError
+                descriptors={descriptors}
+            />
+        );
+    }
     return (
         <StackView
             headerMode="none"
