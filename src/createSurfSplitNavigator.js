@@ -183,8 +183,8 @@ export const SurfSplitNavigator = ({
 
     // TODO: there could be issues on iOS with rendering
     // need to check it and disable for iOS if it works badly
-    // if (Platform.OS === 'android' && screensEnabled()) {
-    if (Platform.OS !== 'web' && screensEnabled()) {
+    if (Platform.OS === 'android' && screensEnabled()) {
+        // if (Platform.OS !== 'web' && screensEnabled()) {
         return (
             <NativeStackView
                 state={stackState}
