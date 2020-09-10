@@ -8,19 +8,23 @@
 
 import 'react-native-gesture-handler';
 import React from 'react';
-import { StyleSheet, View, Text, Button, SafeAreaView } from 'react-native';
-import Modal from 'react-native-web-modal';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { useReduxDevToolsExtension } from '@react-navigation/devtools';
 import {
-    createSurfSplitNavigator,
-    createSurfModalNavigator,
-    SurfModalController,
-} from 'react-navigation-surf';
+    StyleSheet,
+    View,
+    Text,
+    Button,
+    SafeAreaView,
+    TextInput,
+} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { useReduxDevToolsExtension } from '@react-navigation/devtools';
+import { createSurfSplitNavigator } from 'react-navigation-surf';
+import { enableScreens } from 'react-native-screens';
+import { createNativeStackNavigator } from 'react-native-screens/native-stack';
+
+enableScreens();
 
 const SurfSplit = createSurfSplitNavigator();
-const SurfModal = createSurfModalNavigator();
 
 const Main = ({ navigation }) => (
     <SafeAreaView>
@@ -34,10 +38,6 @@ const Detail1Foo = ({ navigation }) => (
     <View>
         <Text style={styles.title}>Detail 1 - foo</Text>
         <Button onPress={() => navigation.push('bar')} title="Go to bar" />
-        <Button
-            onPress={() => SurfModalController.show('test-modal')}
-            title="Open modal"
-        />
     </View>
 );
 
@@ -48,7 +48,7 @@ const Detail1Bar = ({ navigation }) => (
     </View>
 );
 
-const Detail1Stack = createStackNavigator();
+const Detail1Stack = createNativeStackNavigator();
 const Detail1 = () => (
     <Detail1Stack.Navigator initialRouteName="foo">
         <Detail1Stack.Screen name="foo" component={Detail1Foo} />
@@ -60,28 +60,6 @@ const Detail2 = () => (
     <SafeAreaView>
         <Text style={styles.title}>Detail 2</Text>
     </SafeAreaView>
-);
-
-const TestModal = ({ route, navigation }) => (
-    <Modal visible={route.params?.visible} transparent>
-        <View style={styles.modalWrapper}>
-            <View style={styles.modal}>
-                <Text>Hello from Modal!</Text>
-                <Button
-                    title="Close modal"
-                    onPress={() => {
-                        navigation.hide(route.name);
-                        // or
-                        // navigation.goBack();
-                        // or
-                        // SurfModalController.hide(
-                        //     route.name,
-                        // );
-                    }}
-                />
-            </View>
-        </View>
-    </Modal>
 );
 
 const App: () => React$Node = () => {
@@ -106,11 +84,6 @@ const App: () => React$Node = () => {
                     <SurfSplit.Screen name="first" component={Detail1} />
                     <SurfSplit.Screen name="second" component={Detail2} />
                 </SurfSplit.Navigator>
-            </NavigationContainer>
-            <NavigationContainer>
-                <SurfModal.Navigator>
-                    <SurfModal.Screen name="test-modal" component={TestModal} />
-                </SurfModal.Navigator>
             </NavigationContainer>
         </>
     );
