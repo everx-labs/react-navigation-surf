@@ -125,11 +125,11 @@ export const SurfSplitNavigator = ({
         );
     }, [isSplitted]);
 
-    const loadedRef = React.useRef([]);
+    const [loaded, setLoaded] = React.useState<Array<number>>([]);
 
     React.useEffect(() => {
-        if (!loadedRef.current.includes(state.index)) {
-            loadedRef.current = [...loadedRef.current, state.index];
+        if (!loaded.includes(state.index)) {
+            setLoaded([...loaded, state.index]);
         }
     }, [state]);
 
@@ -152,10 +152,7 @@ export const SurfSplitNavigator = ({
                                 const descriptor = descriptors[route.key];
                                 const isFocused = state.index === index;
 
-                                if (
-                                    !isSplitted &&
-                                    !loadedRef.current.includes(index)
-                                ) {
+                                if (!loaded.includes(index)) {
                                     return null;
                                 }
 
