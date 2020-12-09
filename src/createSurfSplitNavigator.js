@@ -42,8 +42,7 @@ const useWindowDimensions =
     useWindowDimensionsNative ||
     function useWindowDimensionsFallback() {
         const [dimensions, setDimensions] = React.useState(() =>
-            Dimensions.get('window'),
-        );
+            Dimensions.get('window'),);
 
         React.useEffect(() => {
             function handleChange({ window }) {
@@ -125,6 +124,9 @@ export const SurfSplitNavigator = ({
         );
     }, [isSplitted]);
 
+    /**
+     * Disable the lazy loading, as it breaks
+     * the navigation to an unmounted screen!
     const [loaded, setLoaded] = React.useState<Array<number>>([]);
 
     React.useEffect(() => {
@@ -132,6 +134,7 @@ export const SurfSplitNavigator = ({
             setLoaded([...loaded, state.index]);
         }
     }, [state]);
+    */
 
     if (isSplitted) {
         const mainRoute = state.routes.find(
@@ -149,12 +152,22 @@ export const SurfSplitNavigator = ({
                         </View>
                         <View style={splitStyles.detail}>
                             {state.routes.map((route, index) => {
-                                const descriptor = descriptors[route.key];
-                                const isFocused = state.index === index;
-
-                                if (!loaded.includes(index)) {
+                                if (route.key === mainRoute.key) {
+                                    // Do not render the main screen on the detail view
                                     return null;
                                 }
+
+                                /**
+                                 * Disable the lazy loading, as it breaks
+                                 * the navigation to an unmounted screen!
+                                if (!loaded.includes(index)) {
+                                    // Do not render the screen if we've never navigated to it
+                                    return null;
+                                }
+                                */
+
+                                const descriptor = descriptors[route.key];
+                                const isFocused = state.index === index;
 
                                 return (
                                     <ResourceSavingScene
