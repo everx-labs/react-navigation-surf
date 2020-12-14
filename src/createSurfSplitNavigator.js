@@ -21,7 +21,7 @@ import type {
 } from '@react-navigation/native';
 import { StackView } from '@react-navigation/stack';
 import type { StackOptions } from '@react-navigation/stack';
-import { screensEnabled } from 'react-native-screens';
+import { ScreenContainer, screensEnabled } from 'react-native-screens';
 import { NativeStackView } from 'react-native-screens/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -42,7 +42,8 @@ const useWindowDimensions =
     useWindowDimensionsNative ||
     function useWindowDimensionsFallback() {
         const [dimensions, setDimensions] = React.useState(() =>
-            Dimensions.get('window'),);
+            Dimensions.get('window'),
+        );
 
         React.useEffect(() => {
             function handleChange({ window }) {
@@ -124,9 +125,6 @@ export const SurfSplitNavigator = ({
         );
     }, [isSplitted]);
 
-    /**
-     * Disable the lazy loading, as it breaks
-     * the navigation to an unmounted screen!
     const [loaded, setLoaded] = React.useState<Array<number>>([]);
 
     React.useEffect(() => {
@@ -134,7 +132,6 @@ export const SurfSplitNavigator = ({
             setLoaded([...loaded, state.index]);
         }
     }, [state]);
-    */
 
     if (isSplitted) {
         const mainRoute = state.routes.find(
@@ -151,34 +148,34 @@ export const SurfSplitNavigator = ({
                             {descriptors[mainRoute.key].render()}
                         </View>
                         <View style={splitStyles.detail}>
-                            {state.routes.map((route, index) => {
-                                if (route.key === mainRoute.key) {
-                                    // Do not render the main screen on the detail view
-                                    return null;
-                                }
+                            <ScreenContainer style={styles.pages}>
+                                {state.routes.map((route, index) => {
+                                    const descriptor = descriptors[route.key];
+                                    const isFocused = state.index === index;
 
-                                /**
-                                 * Disable the lazy loading, as it breaks
-                                 * the navigation to an unmounted screen!
-                                if (!loaded.includes(index)) {
-                                    // Do not render the screen if we've never navigated to it
-                                    return null;
-                                }
-                                */
+                                    // Do not render main route
+                                    if (route.key === mainRoute.key) {
+                                        return null;
+                                    }
 
-                                const descriptor = descriptors[route.key];
-                                const isFocused = state.index === index;
+                                    // isFocused is important here
+                                    // as a screen could be rendered
+                                    // before it was put to `loaded` screens
+                                    if (!loaded.includes(index) && !isFocused) {
+                                        return null;
+                                    }
 
-                                return (
-                                    <ResourceSavingScene
-                                        key={route.key}
-                                        style={StyleSheet.absoluteFill}
-                                        isVisible={isFocused}
-                                    >
-                                        {descriptor.render()}
-                                    </ResourceSavingScene>
-                                );
-                            })}
+                                    return (
+                                        <ResourceSavingScene
+                                            key={route.key}
+                                            style={StyleSheet.absoluteFill}
+                                            isVisible={isFocused}
+                                        >
+                                            {descriptor.render()}
+                                        </ResourceSavingScene>
+                                    );
+                                })}
+                            </ScreenContainer>
                         </View>
                     </View>
                 </SafeAreaProvider>
@@ -243,5 +240,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         flex: 1,
         borderRadius: 5,
+    },
+    pages: {
+        flex: 1,
     },
 });
