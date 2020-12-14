@@ -12,6 +12,7 @@ import {
     NavigationHelpersContext,
     useNavigationBuilder,
     createNavigatorFactory,
+    useTheme,
 } from '@react-navigation/native';
 import type {
     StackNavigationState,
@@ -21,11 +22,11 @@ import type {
 } from '@react-navigation/native';
 import { StackView } from '@react-navigation/stack';
 import type { StackOptions } from '@react-navigation/stack';
-import { ScreenContainer, screensEnabled } from 'react-native-screens';
+import { screensEnabled, ScreenContainer } from 'react-native-screens';
 import { NativeStackView } from 'react-native-screens/native-stack';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ResourceSavingScene } from './ResourceSavingScene';
+import { SafeAreaProviderCompat } from './SafeAreaProviderCompat';
 import {
     SurfSplitRouter,
     SurfSplitActions,
@@ -68,6 +69,28 @@ const useWindowDimensions =
 
         return dimensions;
     };
+
+function SceneContent({
+    isFocused,
+    children,
+}: {
+    isFocused: boolean,
+    children: React$Node,
+}) {
+    const { colors } = useTheme();
+
+    return (
+        <View
+            accessibilityElementsHidden={!isFocused}
+            importantForAccessibility={
+                isFocused ? 'auto' : 'no-hide-descendants'
+            }
+            style={[styles.content, { backgroundColor: colors.background }]}
+        >
+            {children}
+        </View>
+    );
+}
 
 type SurfSplitNavigatorProps = {|
     +children?: React.Node,
@@ -142,7 +165,7 @@ export const SurfSplitNavigator = ({
         }
         return (
             <NavigationHelpersContext.Provider value={navigation}>
-                <SafeAreaProvider>
+                <SafeAreaProviderCompat>
                     <View style={splitStyles.body}>
                         <View style={splitStyles.main}>
                             {descriptors[mainRoute.key].render()}
@@ -158,10 +181,11 @@ export const SurfSplitNavigator = ({
                                         return null;
                                     }
 
-                                    // isFocused is important here
-                                    // as a screen could be rendered
-                                    // before it was put to `loaded` screens
+                                    // isFocused check is important here
+                                    // as we can try to render a screen before it was put
+                                    // to `loaded` screens
                                     if (!loaded.includes(index) && !isFocused) {
+                                        // Don't render a screen if we've never navigated to it
                                         return null;
                                     }
 
@@ -171,14 +195,16 @@ export const SurfSplitNavigator = ({
                                             style={StyleSheet.absoluteFill}
                                             isVisible={isFocused}
                                         >
-                                            {descriptor.render()}
+                                            <SceneContent isFocused={isFocused}>
+                                                {descriptor.render()}
+                                            </SceneContent>
                                         </ResourceSavingScene>
                                     );
                                 })}
                             </ScreenContainer>
                         </View>
                     </View>
-                </SafeAreaProvider>
+                </SafeAreaProviderCompat>
             </NavigationHelpersContext.Provider>
         );
     }
@@ -191,7 +217,7 @@ export const SurfSplitNavigator = ({
     // TODO: there could be issues on iOS with rendering
     // need to check it and disable for iOS if it works badly
     // if (Platform.OS === 'android' && screensEnabled()) {
-    if (Platform.OS !== 'web' && screensEnabled()) {
+    if (Platform.OS !== 'web' && screensEnabled?.()) {
         return (
             <NativeStackView
                 state={stackState}
@@ -242,6 +268,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     pages: {
+        flex: 1,
+    },
+    content: {
         flex: 1,
     },
 });

@@ -11,6 +11,9 @@
     "lint": "eslint src && flow src",
     "dev-install": "npx npm-install-peers && npx flow-typed install @react-navigation/core@5.x.x @react-navigation/native@5.x.x @react-navigation/bottom-tabs@5.x.x @react-navigation/stack@5.x.x && cp -r flow-typed Example/flow-typed"
   },
+  "dependencies": {
+    "react-native-iphone-x-helper": "^1.3.0"
+  },
   "peerDependencies": {
     "react": "^16.11.0",
     "react-native": "^0.62.2",
