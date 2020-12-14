@@ -56,9 +56,13 @@ const Detail1 = () => (
     </Detail1Stack.Navigator>
 );
 
-const Detail2 = () => (
+const Detail2 = ({ navigation }) => (
     <SafeAreaView>
         <Text style={styles.title}>Detail 2</Text>
+        <Button
+            onPress={() => navigation.navigate('first', { screen: 'bar' })}
+            title="Go to first bar"
+        />
     </SafeAreaView>
 );
 
