@@ -43,8 +43,7 @@ const useWindowDimensions =
     useWindowDimensionsNative ||
     function useWindowDimensionsFallback() {
         const [dimensions, setDimensions] = React.useState(() =>
-            Dimensions.get('window'),
-        );
+            Dimensions.get('window'));
 
         React.useEffect(() => {
             function handleChange({ window }) {
