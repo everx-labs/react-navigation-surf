@@ -174,7 +174,7 @@ export const SurfSplitNavigator = ({
                         </View>
                         <View style={splitStyles.detail}>
                             <ScreenContainer
-                                enabled={isNativeStack}
+                                enabled={!isNativeStack}
                                 style={styles.pages}
                             >
                                 {state.routes.map((route, index) => {
