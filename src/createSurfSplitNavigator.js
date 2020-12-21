@@ -1,4 +1,5 @@
 // @flow strict-local
+/* eslint-disable function-paren-newline */
 import * as React from 'react';
 import {
     useWindowDimensions as useWindowDimensionsNative,
@@ -115,6 +116,7 @@ export const SurfSplitNavigator = ({
 }: SurfSplitNavigatorProps) => {
     const dimensions = useWindowDimensions();
     const isSplitted = getIsSplitted(dimensions, mainWidth);
+    const doesSupportNative = Platform.OS !== 'web' && screensEnabled?.();
 
     const { splitStyles: splitStylesFromOptions, ...restScreenOptions } =
         screenOptions || {};
@@ -171,7 +173,13 @@ export const SurfSplitNavigator = ({
                             {descriptors[mainRoute.key].render()}
                         </View>
                         <View style={splitStyles.detail}>
-                            <ScreenContainer style={styles.pages}>
+                            <ScreenContainer
+                                // If not disabling the container for native, it will crash on iOS.
+                                // It happens due to an error in `react-native-reanimated`:
+                                // https://github.com/software-mansion/react-native-reanimated/issues/216
+                                enabled={!doesSupportNative}
+                                style={styles.pages}
+                            >
                                 {state.routes.map((route, index) => {
                                     const descriptor = descriptors[route.key];
                                     const isFocused = state.index === index;
@@ -217,7 +225,7 @@ export const SurfSplitNavigator = ({
     // TODO: there could be issues on iOS with rendering
     // need to check it and disable for iOS if it works badly
     // if (Platform.OS === 'android' && screensEnabled()) {
-    if (Platform.OS !== 'web' && screensEnabled?.()) {
+    if (doesSupportNative) {
         return (
             <NativeStackView
                 state={stackState}
