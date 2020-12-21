@@ -116,7 +116,7 @@ export const SurfSplitNavigator = ({
 }: SurfSplitNavigatorProps) => {
     const dimensions = useWindowDimensions();
     const isSplitted = getIsSplitted(dimensions, mainWidth);
-    const isNativeStack = Platform.OS !== 'web' && screensEnabled?.();
+    const doesSupportNative = Platform.OS !== 'web' && screensEnabled?.();
 
     const { splitStyles: splitStylesFromOptions, ...restScreenOptions } =
         screenOptions || {};
@@ -174,7 +174,10 @@ export const SurfSplitNavigator = ({
                         </View>
                         <View style={splitStyles.detail}>
                             <ScreenContainer
-                                enabled={!isNativeStack}
+                                // If not disabling the container for native, it will crash on iOS.
+                                // It happens due to an error in `react-native-reanimated`:
+                                // https://github.com/software-mansion/react-native-reanimated/issues/216
+                                enabled={!doesSupportNative}
                                 style={styles.pages}
                             >
                                 {state.routes.map((route, index) => {
@@ -222,7 +225,7 @@ export const SurfSplitNavigator = ({
     // TODO: there could be issues on iOS with rendering
     // need to check it and disable for iOS if it works badly
     // if (Platform.OS === 'android' && screensEnabled()) {
-    if (isNativeStack) {
+    if (doesSupportNative) {
         return (
             <NativeStackView
                 state={stackState}
