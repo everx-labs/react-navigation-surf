@@ -1,4 +1,5 @@
 // @flow strict-local
+/* eslint-disable function-paren-newline */
 import * as React from 'react';
 import {
     useWindowDimensions as useWindowDimensionsNative,
@@ -43,7 +44,8 @@ const useWindowDimensions =
     useWindowDimensionsNative ||
     function useWindowDimensionsFallback() {
         const [dimensions, setDimensions] = React.useState(() =>
-            Dimensions.get('window'));
+            Dimensions.get('window'),
+        );
 
         React.useEffect(() => {
             function handleChange({ window }) {
@@ -114,6 +116,7 @@ export const SurfSplitNavigator = ({
 }: SurfSplitNavigatorProps) => {
     const dimensions = useWindowDimensions();
     const isSplitted = getIsSplitted(dimensions, mainWidth);
+    const isNativeStack = Platform.OS !== 'web' && screensEnabled?.();
 
     const { splitStyles: splitStylesFromOptions, ...restScreenOptions } =
         screenOptions || {};
@@ -170,7 +173,10 @@ export const SurfSplitNavigator = ({
                             {descriptors[mainRoute.key].render()}
                         </View>
                         <View style={splitStyles.detail}>
-                            <ScreenContainer style={styles.pages}>
+                            <ScreenContainer
+                                enabled={isNativeStack}
+                                style={styles.pages}
+                            >
                                 {state.routes.map((route, index) => {
                                     const descriptor = descriptors[route.key];
                                     const isFocused = state.index === index;
@@ -216,7 +222,7 @@ export const SurfSplitNavigator = ({
     // TODO: there could be issues on iOS with rendering
     // need to check it and disable for iOS if it works badly
     // if (Platform.OS === 'android' && screensEnabled()) {
-    if (Platform.OS !== 'web' && screensEnabled?.()) {
+    if (isNativeStack) {
         return (
             <NativeStackView
                 state={stackState}
