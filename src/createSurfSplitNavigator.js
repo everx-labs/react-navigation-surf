@@ -134,6 +134,7 @@ export const SurfSplitNavigator = ({
     >(SurfSplitRouter, {
         children,
         initialRouteName,
+        // $FlowExpectedError
         screenOptions: {
             ...restScreenOptions,
             headerShown: false,
