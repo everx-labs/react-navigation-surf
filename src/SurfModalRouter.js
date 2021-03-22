@@ -265,12 +265,11 @@ export const SurfModalRouter: RouterFactory<
                             if (modalRouteIndex === i) {
                                 orderCounter += 1;
                                 order = orderCounter;
-                                params = Object.assign(
-                                    {},
-                                    modalRouteConfig?.defaultProps,
-                                    action.payload.params,
-                                    { visible: true },
-                                );
+                                params = {
+                                    ...modalRouteConfig?.defaultProps,
+                                    ...action.payload.params,
+                                    visible: true,
+                                };
                             }
 
                             return {
@@ -349,8 +348,12 @@ export const SurfModalRouter: RouterFactory<
                 }
 
                 case MODAL_ACTION_TYPES.GO_BACK: {
-                    const activeRoute = getRouteWithHighestOrder(state.routes);
+                    if (state.index === 0) {
+                        // Cannot go back
+                        return null;
+                    }
 
+                    const activeRoute = getRouteWithHighestOrder(state.routes);
                     if (activeRoute == null) {
                         return null;
                     }
