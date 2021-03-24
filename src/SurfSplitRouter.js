@@ -268,6 +268,29 @@ export const SurfSplitRouter: RouterFactory<
                 if (newState == null) {
                     return null;
                 }
+
+                // Ensure the history always includes the initial route
+                const initialRoute = state.routes.find(
+                    ({ name }) => name === initialRouteName,
+                );
+
+                if (initialRoute) {
+                    // Check if the history contains initial route already
+                    if (
+                        !newState.history ||
+                        !newState.history.find(
+                            // $FlowFixMe
+                            ({ key }) => key === initialRoute.key,
+                        )
+                    ) {
+                        // $FlowFixMe
+                        newState.history = [
+                            // Add the initial route to the beginning of the history if not
+                            { type: 'route', key: initialRoute.key },
+                            ...(newState.history || []),
+                        ];
+                    }
+                }
             }
 
             // $FlowFixMe
