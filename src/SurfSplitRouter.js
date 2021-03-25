@@ -270,24 +270,25 @@ export const SurfSplitRouter: RouterFactory<
                 }
 
                 // Ensure the history always includes the initial route
-                const initialRoute = state.routes.find(
-                    ({ name }) => name === initialRouteName,
-                );
-
-                if (initialRoute) {
-                    // Check if the history contains initial route already
+                // N.B. This is mostly important for tab router as it might loose the initial route
+                const { history } = newState;
+                if (history) {
+                    // Check if the history contains the initial route already
+                    const initialRoute = state.routes.find(
+                        ({ name }) => name === initialRouteName,
+                    );
                     if (
-                        !newState.history ||
-                        !newState.history.find(
+                        initialRoute &&
+                        !history.find(
                             // $FlowFixMe
                             ({ key }) => key === initialRoute.key,
                         )
                     ) {
+                        // Add the initial route to the beginning of the history if not
                         // $FlowFixMe
                         newState.history = [
-                            // Add the initial route to the beginning of the history if not
                             { type: 'route', key: initialRoute.key },
-                            ...(newState.history || []),
+                            ...history,
                         ];
                     }
                 }
